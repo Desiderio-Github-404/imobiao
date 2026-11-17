@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f5f7fb;
+  --foreground: #14213d;
+  --muted: #718096;
+  --border: #e8edf4;
+  --navy: #12233f;
+  --blue: #2864e8;
+  --cyan: #23b8c7;
+}
+
+* { box-sizing: border-box; }
+html { min-height: 100%; }
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+button, a { -webkit-tap-highlight-color: transparent; }
+::selection { background: #dce8ff; color: #12233f; }
+
+.sidebar-link {
+  display: flex; align-items: center; gap: 12px; border-radius: 10px;
+  padding: 11px 13px; color: #9eacc1; font-size: 13px; font-weight: 500;
+  transition: .18s ease;
+}
+.sidebar-link:hover, .sidebar-link.active { background: #203653; color: white; }
+.card { background: white; border: 1px solid var(--border); border-radius: 16px; }
