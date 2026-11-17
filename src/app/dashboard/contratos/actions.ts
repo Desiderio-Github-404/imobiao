@@ -97,8 +97,8 @@ export async function updateLease(formData: FormData) {
   const dueDay = Number(dueDayRaw);
   const allowedStatuses = ["draft", "active", "ended", "terminated"];
 
-  if (!leaseId || !/^\\d{4}-\\d{2}-\\d{2}$/.test(startDate) ||
-      (endDate && !/^\\d{4}-\\d{2}-\\d{2}$/.test(endDate)) ||
+  if (!leaseId || !/^\d{4}-\d{2}-\d{2}$/.test(startDate) ||
+      (endDate && !/^\d{4}-\d{2}-\d{2}$/.test(endDate)) ||
       (endDate && endDate < startDate) ||
       rentRaw === "" || !Number.isFinite(rent) || rent < 0 ||
       !Number.isFinite(deposit) || deposit < 0 ||
@@ -169,8 +169,8 @@ export async function renewLease(formData: FormData) {
   const deposit = Number(depositRaw);
   const dueDay = Number(dueDayRaw);
 
-  if (!leaseId || !/^\\d{4}-\\d{2}-\\d{2}$/.test(startDate) ||
-      (endDate && !/^\\d{4}-\\d{2}-\\d{2}$/.test(endDate)) ||
+  if (!leaseId || !/^\d{4}-\d{2}-\d{2}$/.test(startDate) ||
+      (endDate && !/^\d{4}-\d{2}-\d{2}$/.test(endDate)) ||
       (endDate && endDate < startDate) || rentRaw === "" ||
       !Number.isFinite(rent) || rent < 0 || !Number.isFinite(deposit) ||
       deposit < 0 || !Number.isInteger(dueDay) || dueDay < 1 || dueDay > 28 ||
