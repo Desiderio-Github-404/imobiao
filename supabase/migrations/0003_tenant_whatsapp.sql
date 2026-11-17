@@ -5,4 +5,4 @@ alter table public.tenants
 
 alter table public.tenants
   add constraint tenants_whatsapp_phone_format
-  check (whatsapp_phone is null or whatsapp_phone ~ '^\\+[1-9][0-9]{7,14}$');
+  check (whatsapp_phone is null or whatsapp_phone ~ '^\+[1-9][0-9]{7,14}$');
