@@ -64,14 +64,14 @@ returns trigger
 language plpgsql
 security definer
 set search_path = ''
-as $
+as $func$
 begin
   if new.status = 'active' then
     perform public.generate_current_month_rent_charges();
   end if;
   return new;
 end;
-$;
+$func$;
 
 drop trigger if exists on_lease_billing_change on public.leases;
 create trigger on_lease_billing_change
