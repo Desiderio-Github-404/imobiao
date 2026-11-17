@@ -2,6 +2,8 @@
 -- This migration queues messages only. Actual WhatsApp delivery is enabled later
 -- through the official WhatsApp Business Platform and a server-side worker.
 
+create unique index if not exists payments_org_id_uidx on public.payments(organization_id, id);
+
 create table if not exists public.app_notifications (
   id uuid primary key default gen_random_uuid(),
   organization_id uuid not null references public.organizations(id) on delete cascade,
@@ -48,6 +50,7 @@ create table if not exists public.notification_outbox (
   payload jsonb not null default '{}'::jsonb,
   status text not null default 'queued' check (status in ('queued','processing','sent','failed','cancelled')),
   attempts integer not null default 0 check (attempts >= 0),
+  payment_id uuid references public.payments(id) on delete cascade,
   provider_message_id text,
   last_error text,
   scheduled_at timestamptz not null default now(),
@@ -57,8 +60,14 @@ create table if not exists public.notification_outbox (
     references public.tenants(organization_id, id) on delete cascade,
   foreign key (organization_id, charge_id)
     references public.rent_charges(organization_id, id) on delete cascade,
-  unique (charge_id, event_type, channel)
 );
+
+create unique index if not exists notification_outbox_reminder_uidx
+  on public.notification_outbox(charge_id, event_type, channel)
+  where event_type <> 'payment_received';
+create unique index if not exists notification_outbox_payment_uidx
+  on public.notification_outbox(payment_id, channel)
+  where payment_id is not null;
 
 create index if not exists notification_outbox_queue_idx
   on public.notification_outbox(status, scheduled_at)
@@ -120,7 +129,7 @@ begin
   if v_tenant.whatsapp_notifications_enabled
      and v_tenant.whatsapp_phone is not null then
     insert into public.notification_outbox (
-      organization_id, tenant_id, charge_id, event_type, recipient, payload
+      organization_id, tenant_id, charge_id, event_type, recipient, payload, payment_id
     ) values (
       new.organization_id, v_tenant.id, new.charge_id, 'payment_received',
       v_tenant.whatsapp_phone,
@@ -132,9 +141,10 @@ begin
         'property_name', v_property_name,
         'unit_name', v_unit_name,
         'receipt_note', 'O recibo está disponível na plataforma ImobiAO.'
-      )
+      ),
+      new.id
     )
-    on conflict (charge_id, event_type, channel) do nothing;
+    on conflict do nothing;
   end if;
 
   return new;
@@ -196,7 +206,7 @@ begin
       or rc.due_date = current_date
       or rc.due_date = current_date - 1
     )
-  on conflict (charge_id, event_type, channel) do nothing;
+  on conflict do nothing;
 
   get diagnostics v_count = row_count;
   return v_count;
