@@ -56,6 +56,29 @@ $$;
 
 revoke all on function public.generate_current_month_rent_charges() from public, anon, authenticated;
 
+
+-- Also generate the current month's charge immediately when a lease is activated
+-- or its billing terms change, rather than waiting for the daily schedule.
+create or replace function public.on_lease_billing_change()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $
+begin
+  if new.status = 'active' then
+    perform public.generate_current_month_rent_charges();
+  end if;
+  return new;
+end;
+$;
+
+drop trigger if exists on_lease_billing_change on public.leases;
+create trigger on_lease_billing_change
+after insert or update of status, start_date, end_date, monthly_rent, due_day
+on public.leases
+for each row execute function public.on_lease_billing_change();
+
 -- Supabase projects support pg_cron. The job runs at 00:05 UTC (01:05 in Angola).
 create extension if not exists pg_cron;
 
