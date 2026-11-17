@@ -37,7 +37,10 @@ export default async function RenewLeasePage({ params, searchParams }: Props) {
 
   const tenant = lease.tenants as unknown as { full_name: string } | null;
   const unit = lease.units as unknown as { name: string } | null;
-  const suggestedStart = lease.end_date ? addOneDay(lease.end_date) : todayLocal();
+  const earliestStart = addOneDay(lease.start_date);
+  const today = todayLocal();
+  const afterOldEnd = lease.end_date ? addOneDay(lease.end_date) : today;
+  const suggestedStart = [earliestStart, today, afterOldEnd].sort().at(-1) ?? today;
   const errors: Record<string,string> = {
     "dados-invalidos": "Verifique as datas, os valores e o dia de vencimento.",
     "data-invalida": "A data de início da renovação deve ser posterior ao início do contrato atual.",
@@ -59,7 +62,7 @@ export default async function RenewLeasePage({ params, searchParams }: Props) {
         <div className="notice-box">Será criado um novo contrato ativo. O contrato atual será encerrado no dia anterior ao início da renovação (ou manterá a data de término anterior, se já tiver terminado). As cobranças e os pagamentos antigos serão preservados.</div>
         <div className="form-section-label">Novo período contratual</div>
         <div className="form-two-columns">
-          <label>Início da renovação *<input name="start_date" type="date" required min={addOneDay(lease.start_date)} defaultValue={suggestedStart}/></label>
+          <label>Início da renovação *<input name="start_date" type="date" required min={earliestStart} defaultValue={suggestedStart}/></label>
           <label>Fim da renovação<input name="end_date" type="date" min={suggestedStart}/></label>
         </div>
         <div className="form-section-label">Novas condições financeiras</div>
