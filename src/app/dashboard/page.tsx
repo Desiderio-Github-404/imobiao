@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
-import { LogOut, Building2, Users, Wallet, Plus, Home, UserRoundPlus, FileText, Bell } from "lucide-react";
+import { LogOut, Building2, Users, Wallet, Plus, Home, UserRoundPlus, FileText, Bell, Activity } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import FinanceChart from "./finance-chart";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -16,14 +17,20 @@ export default async function DashboardPage() {
   const org = membership?.organizations as unknown as { name: string } | null;
   const organizationId = membership?.organization_id;
 
-  const [propertiesResult, tenantsResult, unitsResult, chargesResult] = organizationId
+  const twelveMonthsAgo = new Date();
+  twelveMonthsAgo.setUTCMonth(twelveMonthsAgo.getUTCMonth() - 11);
+  twelveMonthsAgo.setUTCDate(1);
+  const fromDate = twelveMonthsAgo.toISOString().slice(0,10);
+
+  const [propertiesResult, tenantsResult, unitsResult, chargesResult, paymentsResult] = organizationId
     ? await Promise.all([
         supabase.from("properties").select("id", { count: "exact", head: true }).eq("organization_id", organizationId),
         supabase.from("tenants").select("id", { count: "exact", head: true }).eq("organization_id", organizationId),
         supabase.from("units").select("id", { count: "exact", head: true }).eq("organization_id", organizationId),
-        supabase.from("rent_charges").select("amount_due, amount_paid, status").eq("organization_id", organizationId),
+        supabase.from("rent_charges").select("amount_due, amount_paid, period_start").eq("organization_id", organizationId).gte("period_start", fromDate),
+        supabase.from("payments").select("amount, payment_date").eq("organization_id", organizationId).gte("payment_date", fromDate),
       ])
-    : [null, null, null, null];
+    : [null, null, null, null, null];
 
   const outstanding = chargesResult?.data?.reduce((sum, charge) => sum + Number(charge.amount_due) - Number(charge.amount_paid), 0) ?? 0;
   const stats = [
@@ -32,6 +39,25 @@ export default async function DashboardPage() {
     { label: "Inquilinos", value: tenantsResult?.count ?? 0, icon: Users },
     { label: "Por receber", value: `${new Intl.NumberFormat("pt-AO").format(outstanding)} Kz`, icon: Wallet },
   ];
+
+  const monthly = new Map<string,{month:string;label:string;billed:number;received:number}>();
+  const now = new Date();
+  for(let i=11;i>=0;i--){
+    const date = new Date(Date.UTC(now.getUTCFullYear(),now.getUTCMonth()-i,1));
+    const key = date.toISOString().slice(0,7);
+    const label = new Intl.DateTimeFormat("pt-AO",{month:"short",timeZone:"UTC"}).format(date);
+    monthly.set(key,{month:key,label:label.charAt(0).toUpperCase()+label.slice(1),billed:0,received:0});
+  }
+  chargesResult?.data?.forEach(charge=>{
+    const key=String(charge.period_start).slice(0,7);
+    const point=monthly.get(key);
+    if(point) point.billed+=Number(charge.amount_due);
+  });
+  paymentsResult?.data?.forEach(payment=>{
+    const key=String(payment.payment_date).slice(0,7);
+    const point=monthly.get(key);
+    if(point) point.received+=Number(payment.amount);
+  });
 
   async function signOut() {
     "use server";
@@ -49,8 +75,9 @@ export default async function DashboardPage() {
       <div className="dashboard-welcome"><div><p className="eyebrow">PAINEL DE CONTROLO</p><h1>O seu património, sob controlo.</h1><p className="auth-description">Resumo atualizado com os dados registados na sua organização.</p></div><a href="/dashboard/imoveis/novo" className="primary-link"><Plus size={17}/> Adicionar imóvel</a></div>
       {!membership && <div className="notice-box">A sua conta ainda não está associada a uma organização. Termine o registo ou contacte o suporte para concluir a configuração.</div>}
       <div className="stats-grid">{stats.map(({label,value,icon:Icon})=><article className="stat-card" key={label}><span className="stat-icon"><Icon size={20}/></span><p>{label}</p><strong>{value}</strong></article>)}</div>
+      {organizationId && <FinanceChart data={Array.from(monthly.values())}/>}
       {(propertiesResult?.count ?? 0) === 0 ? <section className="empty-panel"><div className="empty-icon"><Building2 size={25}/></div><h2>Comece por registar o seu primeiro imóvel</h2><p>Depois poderá adicionar unidades, inquilinos, contratos e acompanhar as rendas.</p><a href="/dashboard/imoveis/novo" className="primary-link"><Plus size={16}/> Registar primeiro imóvel</a></section> : <section className="empty-panel"><div className="empty-icon"><Building2 size={25}/></div><h2>Os seus imóveis estão organizados</h2><p>Consulte a carteira de imóveis e continue a gerir o seu património.</p><a href="/dashboard/imoveis" className="primary-link">Ver todos os imóveis</a></section>}
-      <div className="dashboard-quick-links"><a href="/dashboard/imoveis"><Building2 size={17}/> Imóveis</a><a href="/dashboard/unidades"><Home size={17}/> Unidades</a><a href="/dashboard/inquilinos"><UserRoundPlus size={17}/> Inquilinos</a><a href="/dashboard/contratos"><FileText size={17}/> Contratos</a><a href="/dashboard/rendas"><Wallet size={17}/> Rendas e pagamentos</a><a href="/dashboard/notificacoes"><Bell size={17}/> Notificações</a></div><p className="dashboard-footnote">Os indicadores apresentados são calculados a partir dos registos reais da sua conta.</p>
+      <div className="dashboard-quick-links"><a href="/dashboard/imoveis"><Building2 size={17}/> Imóveis</a><a href="/dashboard/unidades"><Home size={17}/> Unidades</a><a href="/dashboard/inquilinos"><UserRoundPlus size={17}/> Inquilinos</a><a href="/dashboard/contratos"><FileText size={17}/> Contratos</a><a href="/dashboard/rendas"><Wallet size={17}/> Rendas e pagamentos</a><a href="/dashboard/notificacoes"><Bell size={17}/> Notificações</a><a href="/dashboard/atividades"><Activity size={17}/> Histórico de atividades</a></div><p className="dashboard-footnote">Os indicadores apresentados são calculados a partir dos registos reais da sua conta.</p>
     </section>
   </main>;
 }
