@@ -100,3 +100,11 @@ a { text-decoration:none; }
 
 .dashboard-quick-links { display:flex; flex-wrap:wrap; gap:10px; margin-top:22px; }
 .dashboard-quick-links a { display:inline-flex; align-items:center; gap:8px; padding:12px 15px; border:1px solid var(--border); border-radius:10px; background:#fff; color:#34445c; font-size:12px; font-weight:700; }
+
+
+.lease-status { display:inline-flex; padding:6px 9px; border-radius:20px; background:#f1f5f9; color:#53627a; font-size:10px; font-weight:800; }
+.lease-status-active { background:#ecfdf3; color:#067647; }
+.lease-status-draft { background:#fff7e6; color:#9a6700; }
+.lease-status-ended,.lease-status-terminated { background:#fff0f0; color:#b42318; }
+.lease-detail { display:flex; align-items:center; gap:7px; margin:8px 0 0; color:#64748b; font-size:11px; }
+.lease-detail svg { flex:0 0 auto; }
