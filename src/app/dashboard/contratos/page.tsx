@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowLeft, FileText, Plus, CalendarDays, Home, Pencil } from "lucide-react";
+import { ArrowLeft, FileText, Plus, CalendarDays, Home, Pencil, RefreshCw } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 
 type Lease = {
@@ -44,6 +44,7 @@ export default async function LeasesPage({ searchParams }: { searchParams: Promi
       </div>
       {params.sucesso === "criado" && <p className="form-success page-message">Contrato registado com sucesso.</p>}
       {params.sucesso === "actualizado" && <p className="form-success page-message">Contrato atualizado com sucesso.</p>}
+      {params.sucesso === "renovado" && <p className="form-success page-message">Contrato renovado com sucesso. O contrato anterior foi preservado no histórico.</p>}
       {params.erro && <p className="form-error page-message">Não foi possível concluir a operação. Verifique as permissões e os dados do contrato.</p>}
       {error && <p className="form-error page-message">Não foi possível carregar os contratos. Atualize a página.</p>}
       {!data?.length ? <section className="empty-panel">
@@ -57,7 +58,7 @@ export default async function LeasesPage({ searchParams }: { searchParams: Promi
           <p className="lease-detail"><Home size={14}/>{lease.units?.name ?? "Unidade"}</p>
           <p className="lease-detail"><CalendarDays size={14}/>{new Date(`${lease.start_date}T12:00:00`).toLocaleDateString("pt-AO")}{lease.end_date ? ` — ${new Date(`${lease.end_date}T12:00:00`).toLocaleDateString("pt-AO")}` : " — Sem data de término"}</p>
           <p className="unit-rent">{new Intl.NumberFormat("pt-AO").format(Number(lease.monthly_rent))} Kz/mês</p>
-          <Link href={`/dashboard/contratos/${lease.id}/editar`} className="property-units-link"><Pencil size={14}/> Editar contrato</Link>
+          <div className="dashboard-quick-links"><Link href={`/dashboard/contratos/${lease.id}/editar`}><Pencil size={14}/> Editar</Link>{lease.status === "active" && <Link href={`/dashboard/contratos/${lease.id}/renovar`}><RefreshCw size={14}/> Renovar</Link>}</div>
         </article>)}
       </div>}
     </section>
