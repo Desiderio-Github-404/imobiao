@@ -21,7 +21,7 @@ export default async function RentPage({searchParams}:{searchParams:Promise<{suc
    .eq("organization_id",membership.organization_id).order("due_date",{ascending:false}),
   searchParams
  ]);
- const errors:Record<string,string>={"dados-invalidos":"Verifique os dados do pagamento.","sem-permissao":"Não tem permissão para registar pagamentos.","cobranca-invalida":"A cobrança selecionada não foi encontrada.","valor-excessivo":"O valor excede o saldo em dívida.","falha-pagamento":"Não foi possível registar o pagamento.",""};
+ const errors:Record<string,string>={"dados-invalidos":"Verifique os dados do pagamento.","sem-permissao":"Não tem permissão para registar pagamentos.","cobranca-invalida":"A cobrança selecionada não foi encontrada.","valor-excessivo":"O valor excede o saldo em dívida.","falha-pagamento":"Não foi possível registar o pagamento."};
  const success=params.sucesso==="cobranca"?"Cobrança criada com sucesso.":params.sucesso==="pagamento"?"Pagamento registado com sucesso.":"";
  return <main className="dashboard-shell">
   <header className="dashboard-header"><div><Link className="brand" href="/dashboard">Imobi<span>AO</span></Link><p className="dashboard-subtitle">Gestão de património imobiliário</p></div><Link href="/dashboard" className="back-link"><ArrowLeft size={16}/> Painel principal</Link></header>
