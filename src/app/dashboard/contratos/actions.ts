@@ -151,3 +151,60 @@ export async function updateLease(formData: FormData) {
   revalidatePath("/dashboard/unidades");
   redirect("/dashboard/contratos?sucesso=actualizado");
 }
+
+
+export async function renewLease(formData: FormData) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const leaseId = String(formData.get("lease_id") ?? "");
+  const startDate = String(formData.get("start_date") ?? "");
+  const endDate = String(formData.get("end_date") ?? "").trim();
+  const rentRaw = String(formData.get("monthly_rent") ?? "").trim();
+  const depositRaw = String(formData.get("deposit_amount") ?? "0").trim();
+  const dueDayRaw = String(formData.get("due_day") ?? "1").trim();
+  const notes = String(formData.get("notes") ?? "").trim();
+  const rent = Number(rentRaw);
+  const deposit = Number(depositRaw);
+  const dueDay = Number(dueDayRaw);
+
+  if (!leaseId || !/^\\d{4}-\\d{2}-\\d{2}$/.test(startDate) ||
+      (endDate && !/^\\d{4}-\\d{2}-\\d{2}$/.test(endDate)) ||
+      (endDate && endDate < startDate) || rentRaw === "" ||
+      !Number.isFinite(rent) || rent < 0 || !Number.isFinite(deposit) ||
+      deposit < 0 || !Number.isInteger(dueDay) || dueDay < 1 || dueDay > 28 ||
+      notes.length > 2000) {
+    redirect(`/dashboard/contratos/${leaseId}/renovar?erro=dados-invalidos`);
+  }
+
+  const { data: membership } = await supabase.from("memberships")
+    .select("organization_id").eq("user_id", user.id)
+    .in("role", ["owner", "manager"]).limit(1).maybeSingle();
+  if (!membership) redirect("/dashboard/contratos?erro=sem-permissao");
+
+  const { data: newLeaseId, error } = await supabase.rpc("renew_lease", {
+    p_lease_id: leaseId,
+    p_start_date: startDate,
+    p_end_date: endDate || null,
+    p_monthly_rent: rent,
+    p_deposit_amount: deposit,
+    p_due_day: dueDay,
+    p_notes: notes || null,
+  });
+
+  if (error || !newLeaseId) {
+    const message = error?.message ?? "";
+    const code = message.includes("Only active") ? "contrato-inactivo"
+      : message.includes("Renewal must start") ? "data-invalida"
+      : message.includes("duplicate") || error?.code === "23505" ? "unidade-ocupada"
+      : "falha-renovacao";
+    redirect(`/dashboard/contratos/${leaseId}/renovar?erro=${code}`);
+  }
+
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/contratos");
+  revalidatePath("/dashboard/rendas");
+  revalidatePath("/dashboard/unidades");
+  redirect("/dashboard/contratos?sucesso=renovado");
+}
