@@ -27,7 +27,7 @@ export default async function DashboardPage() {
         supabase.from("properties").select("id", { count: "exact", head: true }).eq("organization_id", organizationId),
         supabase.from("tenants").select("id", { count: "exact", head: true }).eq("organization_id", organizationId),
         supabase.from("units").select("id", { count: "exact", head: true }).eq("organization_id", organizationId),
-        supabase.from("rent_charges").select("amount_due, amount_paid, period_start").eq("organization_id", organizationId).gte("period_start", fromDate),
+        supabase.from("rent_charges").select("amount_due, amount_paid, period_start, status").eq("organization_id", organizationId).gte("period_start", fromDate),
         supabase.from("payments").select("amount, payment_date").eq("organization_id", organizationId).gte("payment_date", fromDate),
       ])
     : [null, null, null, null, null];
@@ -40,6 +40,8 @@ export default async function DashboardPage() {
     { label: "Por receber", value: `${new Intl.NumberFormat("pt-AO").format(outstanding)} Kz`, icon: Wallet },
   ];
 
+  const statusCounts = { paid:0, partially_paid:0, pending:0, overdue:0 };
+  chargesResult?.data?.forEach(charge=>{ const key=charge.status as keyof typeof statusCounts; if(key in statusCounts) statusCounts[key]++; });
   const monthly = new Map<string,{month:string;label:string;billed:number;received:number}>();
   const now = new Date();
   for(let i=11;i>=0;i--){
@@ -75,7 +77,7 @@ export default async function DashboardPage() {
       <div className="dashboard-welcome"><div><p className="eyebrow">PAINEL DE CONTROLO</p><h1>O seu património, sob controlo.</h1><p className="auth-description">Resumo atualizado com os dados registados na sua organização.</p></div><a href="/dashboard/imoveis/novo" className="primary-link"><Plus size={17}/> Adicionar imóvel</a></div>
       {!membership && <div className="notice-box">A sua conta ainda não está associada a uma organização. Termine o registo ou contacte o suporte para concluir a configuração.</div>}
       <div className="stats-grid">{stats.map(({label,value,icon:Icon})=><article className="stat-card" key={label}><span className="stat-icon"><Icon size={20}/></span><p>{label}</p><strong>{value}</strong></article>)}</div>
-      {organizationId && <FinanceChart data={Array.from(monthly.values())}/>}
+      {organizationId && <FinanceChart data={Array.from(monthly.values())} statuses={statusCounts}/>}
       {(propertiesResult?.count ?? 0) === 0 ? <section className="empty-panel"><div className="empty-icon"><Building2 size={25}/></div><h2>Comece por registar o seu primeiro imóvel</h2><p>Depois poderá adicionar unidades, inquilinos, contratos e acompanhar as rendas.</p><a href="/dashboard/imoveis/novo" className="primary-link"><Plus size={16}/> Registar primeiro imóvel</a></section> : <section className="empty-panel"><div className="empty-icon"><Building2 size={25}/></div><h2>Os seus imóveis estão organizados</h2><p>Consulte a carteira de imóveis e continue a gerir o seu património.</p><a href="/dashboard/imoveis" className="primary-link">Ver todos os imóveis</a></section>}
       <div className="dashboard-quick-links"><a href="/dashboard/imoveis"><Building2 size={17}/> Imóveis</a><a href="/dashboard/unidades"><Home size={17}/> Unidades</a><a href="/dashboard/inquilinos"><UserRoundPlus size={17}/> Inquilinos</a><a href="/dashboard/contratos"><FileText size={17}/> Contratos</a><a href="/dashboard/rendas"><Wallet size={17}/> Rendas e pagamentos</a><a href="/dashboard/notificacoes"><Bell size={17}/> Notificações</a><a href="/dashboard/atividades"><Activity size={17}/> Histórico de atividades</a></div><p className="dashboard-footnote">Os indicadores apresentados são calculados a partir dos registos reais da sua conta.</p>
     </section>
