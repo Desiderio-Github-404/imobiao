@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -11,6 +11,17 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const code = new URLSearchParams(window.location.search).get("error");
+    if (code === "organization_setup") {
+      setError("A conta foi confirmada, mas não foi possível criar a organização. Contacte o suporte.");
+    } else if (code === "organization_check") {
+      setError("Não foi possível verificar a organização da sua conta. Tente novamente.");
+    } else if (code === "auth_callback") {
+      setError("Não foi possível concluir a confirmação da conta. Solicite um novo email de confirmação.");
+    }
+  }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
