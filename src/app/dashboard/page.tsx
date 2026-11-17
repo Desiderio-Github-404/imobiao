@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { LogOut, Building2, Users, FileText, Wallet, Plus, Home } from "lucide-react";
+import { LogOut, Building2, Users, Wallet, Plus, Home, UserRoundPlus } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function DashboardPage() {
@@ -50,7 +50,7 @@ export default async function DashboardPage() {
       {!membership && <div className="notice-box">A sua conta ainda não está associada a uma organização. Termine o registo ou contacte o suporte para concluir a configuração.</div>}
       <div className="stats-grid">{stats.map(({label,value,icon:Icon})=><article className="stat-card" key={label}><span className="stat-icon"><Icon size={20}/></span><p>{label}</p><strong>{value}</strong></article>)}</div>
       {(propertiesResult?.count ?? 0) === 0 ? <section className="empty-panel"><div className="empty-icon"><Building2 size={25}/></div><h2>Comece por registar o seu primeiro imóvel</h2><p>Depois poderá adicionar unidades, inquilinos, contratos e acompanhar as rendas.</p><a href="/dashboard/imoveis/novo" className="primary-link"><Plus size={16}/> Registar primeiro imóvel</a></section> : <section className="empty-panel"><div className="empty-icon"><Building2 size={25}/></div><h2>Os seus imóveis estão organizados</h2><p>Consulte a carteira de imóveis e continue a gerir o seu património.</p><a href="/dashboard/imoveis" className="primary-link">Ver todos os imóveis</a></section>}
-      <p className="dashboard-footnote">Os indicadores apresentados são calculados a partir dos registos reais da sua conta.</p>
+      <div className="dashboard-quick-links"><a href="/dashboard/imoveis"><Building2 size={17}/> Imóveis</a><a href="/dashboard/unidades"><Home size={17}/> Unidades</a><a href="/dashboard/inquilinos"><UserRoundPlus size={17}/> Inquilinos</a></div><p className="dashboard-footnote">Os indicadores apresentados são calculados a partir dos registos reais da sua conta.</p>
     </section>
   </main>;
 }
