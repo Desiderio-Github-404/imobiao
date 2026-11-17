@@ -97,3 +97,6 @@ a { text-decoration:none; }
 .field-help { color:#718096; font-size:11px; font-weight:400; line-height:1.5; }
 .property-form .consent-option { display:flex; align-items:flex-start; gap:10px; padding:13px; border:1px solid #d8eee4; border-radius:10px; background:#f4fbf7; color:#345b49; font-size:12px; line-height:1.5; }
 .property-form .consent-option input { flex:0 0 17px; width:17px; min-height:17px; height:17px; margin-top:1px; accent-color:#16845b; }
+
+.dashboard-quick-links { display:flex; flex-wrap:wrap; gap:10px; margin-top:22px; }
+.dashboard-quick-links a { display:inline-flex; align-items:center; gap:8px; padding:12px 15px; border:1px solid var(--border); border-radius:10px; background:#fff; color:#34445c; font-size:12px; font-weight:700; }
