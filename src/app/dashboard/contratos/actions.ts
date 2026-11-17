@@ -208,3 +208,44 @@ export async function renewLease(formData: FormData) {
   revalidatePath("/dashboard/unidades");
   redirect("/dashboard/contratos?sucesso=renovado");
 }
+
+
+export async function terminateLease(formData: FormData) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const leaseId = String(formData.get("lease_id") ?? "");
+  const terminationDate = String(formData.get("termination_date") ?? "");
+  const reason = String(formData.get("reason") ?? "").trim();
+
+  if (!leaseId || !/^\d{4}-\d{2}-\d{2}$/.test(terminationDate) ||
+      reason.length < 5 || reason.length > 1000) {
+    redirect(`/dashboard/contratos/${leaseId}/rescindir?erro=dados-invalidos`);
+  }
+
+  const { data: membership } = await supabase.from("memberships")
+    .select("organization_id").eq("user_id", user.id)
+    .in("role", ["owner", "manager"]).limit(1).maybeSingle();
+  if (!membership) redirect("/dashboard/contratos?erro=sem-permissao");
+
+  const { error } = await supabase.rpc("terminate_lease", {
+    p_lease_id: leaseId,
+    p_termination_date: terminationDate,
+    p_reason: reason,
+  });
+
+  if (error) {
+    const code = error.message.includes("Only active") ? "contrato-inactivo"
+      : error.message.includes("cannot precede") ? "data-invalida"
+      : "falha-rescisao";
+    redirect(`/dashboard/contratos/${leaseId}/rescindir?erro=${code}`);
+  }
+
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/contratos");
+  revalidatePath("/dashboard/unidades");
+  revalidatePath("/dashboard/rendas");
+  revalidatePath("/dashboard/atividades");
+  redirect("/dashboard/contratos?sucesso=rescindido");
+}
