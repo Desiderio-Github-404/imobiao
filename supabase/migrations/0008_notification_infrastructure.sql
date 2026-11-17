@@ -59,7 +59,7 @@ create table if not exists public.notification_outbox (
   foreign key (organization_id, tenant_id)
     references public.tenants(organization_id, id) on delete cascade,
   foreign key (organization_id, charge_id)
-    references public.rent_charges(organization_id, id) on delete cascade,
+    references public.rent_charges(organization_id, id) on delete cascade
 );
 
 create unique index if not exists notification_outbox_reminder_uidx
