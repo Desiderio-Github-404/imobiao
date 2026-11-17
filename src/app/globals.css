@@ -84,3 +84,16 @@ a { text-decoration:none; }
 .unit-meta { display:flex; flex-wrap:wrap; gap:7px; margin-top:12px; }
 .unit-meta span { padding:6px 8px; border-radius:8px; background:#f1f5f9; color:#53627a; font-size:10px; font-weight:700; }
 .unit-rent { margin:14px 0 0; color:#172b49; font-size:17px; font-weight:800; }
+
+
+.tenant-search { display:flex; align-items:center; gap:10px; margin:0 0 22px; padding:7px 10px 7px 13px; border:1px solid var(--border); border-radius:12px; background:white; color:#718096; }
+.tenant-search input { flex:1; min-width:0; height:35px; border:0; outline:0; color:#172b49; font-size:13px; }
+.tenant-search button { min-height:36px; padding:0 13px; border:0; border-radius:8px; background:#edf4ff; color:#2864e8; font-size:11px; font-weight:800; cursor:pointer; }
+.tenant-search a { color:#64748b; font-size:11px; font-weight:700; }
+.tenant-contact { margin:7px 0 0; color:#64748b; font-size:12px; overflow-wrap:anywhere; }
+.tenant-whatsapp { display:flex; align-items:center; flex-wrap:wrap; gap:7px; margin-top:14px; color:#16845b; font-size:11px; }
+.tenant-whatsapp small { padding:4px 7px; border-radius:20px; background:#ecfdf3; color:#067647; font-weight:700; }
+.tenant-whatsapp-heading { display:flex; align-items:center; gap:8px; color:#16845b; }
+.field-help { color:#718096; font-size:11px; font-weight:400; line-height:1.5; }
+.property-form .consent-option { display:flex; align-items:flex-start; gap:10px; padding:13px; border:1px solid #d8eee4; border-radius:10px; background:#f4fbf7; color:#345b49; font-size:12px; line-height:1.5; }
+.property-form .consent-option input { flex:0 0 17px; width:17px; min-height:17px; height:17px; margin-top:1px; accent-color:#16845b; }
