@@ -16,13 +16,13 @@ export async function createTenant(formData: FormData) {
   const whatsappPhoneRaw = String(formData.get("whatsapp_phone") ?? "").trim();
   const whatsappEnabled = formData.get("whatsapp_notifications_enabled") === "on";
   const notes = String(formData.get("notes") ?? "").trim();
-  const whatsappPhone = whatsappPhoneRaw.replace(/[\\s().-]/g, "");
+  const whatsappPhone = whatsappPhoneRaw.replace(/[\s().-]/g, "");
 
   if (fullName.length < 2 || fullName.length > 150 ||
       phone.length > 40 || email.length > 254 ||
       identityDocument.length > 80 || notes.length > 2000 ||
-      (email && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) ||
-      (whatsappPhone && !/^\\+[1-9][0-9]{7,14}$/.test(whatsappPhone)) ||
+      (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) ||
+      (whatsappPhone && !/^\+[1-9][0-9]{7,14}$/.test(whatsappPhone)) ||
       (whatsappEnabled && !whatsappPhone)) {
     redirect("/dashboard/inquilinos/novo?erro=dados-invalidos");
   }
