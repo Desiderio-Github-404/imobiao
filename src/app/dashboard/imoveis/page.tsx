@@ -75,6 +75,7 @@ export default async function PropertiesPage({
                 <h2>{property.name}</h2>
                 <p className="property-location"><MapPin size={14}/>{location || property.address || "Localização não indicada"}</p>
                 {property.address && <p className="property-address">{property.address}</p>}
+                <Link href={`/dashboard/unidades?imovel=${property.id}`} className="property-units-link">Gerir unidades</Link>
               </article>;
             })}
           </div>
