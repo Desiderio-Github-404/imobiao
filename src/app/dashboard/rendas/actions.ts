@@ -79,7 +79,7 @@ export async function recordPayment(formData: FormData) {
   if (!charge) redirect("/dashboard/rendas?erro=cobranca-invalida");
   if (amount > Number(charge.amount_due)-Number(charge.amount_paid)) redirect("/dashboard/rendas?erro=valor-excessivo");
 
-  const { error } = await supabase.rpc("record_rent_payment", {
+  const { data: paymentId, error } = await supabase.rpc("record_rent_payment", {
     p_charge_id: chargeId, p_amount: amount, p_payment_date: date,
     p_payment_method: method, p_reference: reference || null, p_notes: notes || null,
   });
@@ -87,5 +87,6 @@ export async function recordPayment(formData: FormData) {
 
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/rendas");
+  if (paymentId) redirect(`/dashboard/recibos/${paymentId}`);
   redirect("/dashboard/rendas?sucesso=pagamento");
 }
