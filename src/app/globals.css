@@ -210,3 +210,15 @@ a { text-decoration:none; }
 .activity-info p { margin:7px 0; color:#53627a; font-size:12px; overflow-wrap:anywhere; }
 .activity-info small { display:flex; align-items:center; gap:5px; color:#94a3b8; font-size:10px; }
 @media(max-width:620px) { .activity-total { align-self:flex-start; } }
+
+.analytics-grid { display:grid; grid-template-columns:minmax(0,1.65fr) minmax(280px,1fr); gap:16px; margin-top:22px; }
+.analytics-grid .finance-chart-card { margin-top:0; min-width:0; }
+.status-chart-layout { display:flex; align-items:center; gap:10px; min-height:220px; }
+.status-chart { width:58%; height:220px; min-width:0; }
+.status-legend { display:grid; gap:13px; flex:1; min-width:0; }
+.status-legend div { display:grid; grid-template-columns:9px 1fr auto; align-items:center; gap:7px; }
+.status-legend i { width:8px; height:8px; border-radius:50%; }
+.status-legend span { color:#64748b; font-size:10px; }
+.status-legend strong { color:#172b49; font-size:11px; }
+@media(max-width:850px) { .analytics-grid { grid-template-columns:1fr; } }
+@media(max-width:480px) { .status-chart-layout { gap:0; } .status-chart { width:54%; } .status-legend { gap:10px; } }
