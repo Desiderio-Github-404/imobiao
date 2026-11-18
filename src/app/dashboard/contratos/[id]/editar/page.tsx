@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ArrowLeft, Pencil } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { getActiveOrganization } from "@/lib/organization";
 import { updateLease } from "../../actions";
 
 type EditLeasePageProps = {
@@ -12,13 +12,9 @@ type EditLeasePageProps = {
 export default async function EditLeasePage({ params, searchParams }: EditLeasePageProps) {
   const { id } = await params;
   const query = await searchParams;
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const { supabase, user, membership } = await getActiveOrganization();
+  if (!["owner", "manager"].includes(membership.role)) redirect("/dashboard/contratos");
 
-  const { data: membership } = await supabase.from("memberships")
-    .select("organization_id").eq("user_id", user.id).in("role", ["owner", "manager"]).limit(1).maybeSingle();
-  if (!membership) redirect("/dashboard/contratos");
 
   const { data: lease } = await supabase.from("leases")
     .select("id,start_date,end_date,monthly_rent,deposit_amount,due_day,status,notes,tenants(full_name),units(name)")
