@@ -2,12 +2,10 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { getActiveOrganization } from "@/lib/organization";
 
 export async function createProperty(formData: FormData) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const { supabase, membership } = await getActiveOrganization();
 
   const name = String(formData.get("name") ?? "").trim();
   const propertyType = String(formData.get("property_type") ?? "residential");
@@ -21,15 +19,7 @@ export async function createProperty(formData: FormData) {
     redirect("/dashboard/imoveis/novo?erro=verifique-os-dados");
   }
 
-  const { data: membership } = await supabase
-    .from("memberships")
-    .select("organization_id, role")
-    .eq("user_id", user.id)
-    .in("role", ["owner", "manager"])
-    .limit(1)
-    .maybeSingle();
-
-  if (!membership) redirect("/dashboard/imoveis/novo?erro=sem-permissao");
+  if (!["owner", "manager"].includes(membership.role)) redirect("/dashboard/imoveis/novo?erro=sem-permissao");
 
   const { error } = await supabase.from("properties").insert({
     organization_id: membership.organization_id,
