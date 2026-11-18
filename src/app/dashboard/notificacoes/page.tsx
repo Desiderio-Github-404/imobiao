@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { Bell, CheckCheck, ArrowLeft, CreditCard, Clock, AlertTriangle } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { getActiveOrganization } from "@/lib/organization";
 
 const labels: Record<string, string> = {
   payment_received: "Pagamento recebido",
@@ -20,14 +21,13 @@ const icons: Record<string, typeof Bell> = {
 };
 
 export default async function NotificationsPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const { supabase, user, membership } = await getActiveOrganization();
 
   const { data: notifications, error } = await supabase
     .from("app_notifications")
     .select("id, event_type, title, body, read_at, created_at")
     .eq("user_id", user.id)
+    .eq("organization_id", membership.organization_id)
     .order("created_at", { ascending: false })
     .limit(100);
 
@@ -35,14 +35,13 @@ export default async function NotificationsPage() {
     "use server";
     const id = String(formData.get("notification_id") ?? "");
     if (!id) return;
-    const client = await createClient();
-    const { data: { user: currentUser } } = await client.auth.getUser();
-    if (!currentUser) redirect("/login");
+    const { supabase: client, user: currentUser, membership: activeMembership } = await getActiveOrganization();
     await client
       .from("app_notifications")
       .update({ read_at: new Date().toISOString() })
       .eq("id", id)
-      .eq("user_id", currentUser.id);
+      .eq("user_id", currentUser.id)
+      .eq("organization_id", activeMembership.organization_id);
     revalidatePath("/dashboard/notificacoes");
   }
 
