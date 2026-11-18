@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowLeft, Wallet, Plus, CalendarDays, UserRound, CreditCard } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { getActiveOrganization } from "@/lib/organization";
 import { recordPayment } from "./actions";
 
 type Charge = {
@@ -12,10 +12,7 @@ const statusLabels:Record<string,string>={pending:"Pendente",partially_paid:"Par
 const methods=[["cash","Dinheiro"],["bank_transfer","Transferência bancária"],["multicaixa_express","Multicaixa Express"],["other","Outro"]];
 
 export default async function RentPage({searchParams}:{searchParams:Promise<{sucesso?:string;erro?:string}>}) {
- const supabase=await createClient();
- const {data:{user}}=await supabase.auth.getUser(); if(!user) redirect("/login");
- const {data:membership}=await supabase.from("memberships").select("organization_id").eq("user_id",user.id).limit(1).maybeSingle();
- if(!membership) redirect("/dashboard");
+ const { supabase, user, membership } = await getActiveOrganization();
  const [{data},params]=await Promise.all([
   supabase.from("rent_charges").select("id,period_start,due_date,amount_due,amount_paid,status,description,leases(monthly_rent,units(name),tenants(full_name))")
    .eq("organization_id",membership.organization_id).order("due_date",{ascending:false}),
