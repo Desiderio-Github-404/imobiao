@@ -1,35 +1,46 @@
 # ImobiAO
 
-SaaS de gestão imobiliária para proprietários individuais e pequenos gestores em Angola.
+SaaS de gestão imobiliária para proprietários e gestores em Angola, com suporte a organizações e gestão de operações de arrendamento.
 
-## Objetivo da MVP
-Centralizar o controlo de imóveis, unidades, inquilinos, contratos, cobranças de renda e pagamentos, com valores em kwanzas (AOA).
+## Tecnologias
 
-## Stack
-- Next.js App Router + TypeScript
+- Next.js 15, React 19 e TypeScript
 - Tailwind CSS
-- Supabase (PostgreSQL, Auth e Storage)
+- Supabase (PostgreSQL e autenticação)
 - Vercel
-- Lucide React
+- Lucide React e Recharts
+
+## Funcionalidades
+
+O projeto contempla gestão de organizações e membros, imóveis, unidades, inquilinos, contratos, cobranças, pagamentos, recibos e informação financeira. A disponibilidade de cada módulo depende da versão implantada.
 
 ## Desenvolvimento local
-```bash
+
+Requisitos: Node.js compatível com Next.js e npm.
+
+~~~bash
 npm install
 cp .env.example .env.local
 npm run dev
-```
+~~~
 
-A aplicação inicia em http://localhost:3000.
+Configura no .env.local as variáveis exigidas pelo projeto. O README anterior identificava NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY; confirma no código se existem outras variáveis necessárias.
 
-## Configuração Supabase
-Preencher `.env.local` com:
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+Comandos úteis:
 
-Nunca colocar a chave `service_role` em código executado no browser.
+~~~bash
+npm run lint
+npm run typecheck
+npm run build
+npm run start
+~~~
 
-## Estado atual
-Fundação visual da dashboard com dados demonstrativos. Autenticação, persistência, políticas RLS e módulos operacionais serão implementados nas próximas etapas. Os dados atualmente apresentados não são dados reais.
+## Segurança de credenciais
 
-## Público inicial
-Proprietários individuais e pequenos gestores imobiliários em Angola.
+Nunca exponhas a chave Supabase service_role ou qualquer segredo no browser, em variáveis NEXT_PUBLIC_ ou no repositório. Cada instalação deve usar os seus próprios projetos e credenciais.
+
+## Documentação
+
+Consulta [Documentação Técnica e Guia de Implementação](docs/DOCUMENTACAO_TECNICA_E_IMPLEMENTACAO.md) para arquitetura, configuração Supabase, publicação na Vercel, migrações, manutenção e transferência ao comprador.
+
+> Antes de uma entrega comercial, confirma as variáveis de ambiente, migrações e integrações efetivamente usadas pela versão que será entregue.
