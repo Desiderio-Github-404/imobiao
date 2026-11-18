@@ -1,16 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowLeft, FileText } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { getActiveOrganization } from "@/lib/organization";
 import { createLease } from "../actions";
 
 export default async function NewLeasePage({ searchParams }: { searchParams: Promise<{ erro?: string }> }) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
-  const { data: membership } = await supabase.from("memberships")
-    .select("organization_id").eq("user_id", user.id).limit(1).maybeSingle();
-  if (!membership) redirect("/dashboard");
+  const { supabase, user, membership } = await getActiveOrganization();
+  if (!["owner", "manager"].includes(membership.role)) redirect("/dashboard/contratos");
 
   const [{ data: units }, { data: tenants }, params] = await Promise.all([
     supabase.from("units").select("id,name,monthly_rent,properties(name)")
