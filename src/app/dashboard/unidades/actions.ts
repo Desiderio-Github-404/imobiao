@@ -2,12 +2,10 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { getActiveOrganization } from "@/lib/organization";
 
 export async function createUnit(formData: FormData) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const { supabase, membership } = await getActiveOrganization();
 
   const propertyId = String(formData.get("property_id") ?? "");
   const name = String(formData.get("name") ?? "").trim();
@@ -31,15 +29,7 @@ export async function createUnit(formData: FormData) {
     redirect("/dashboard/unidades/novo?erro=dados-invalidos");
   }
 
-  const { data: membership } = await supabase
-    .from("memberships")
-    .select("organization_id")
-    .eq("user_id", user.id)
-    .in("role", ["owner", "manager"])
-    .limit(1)
-    .maybeSingle();
-
-  if (!membership) redirect("/dashboard/unidades/novo?erro=sem-permissao");
+  if (!["owner", "manager"].includes(membership.role)) redirect("/dashboard/unidades/novo?erro=sem-permissao");
 
   const { error } = await supabase.from("units").insert({
     organization_id: membership.organization_id,
