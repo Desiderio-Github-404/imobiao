@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowLeft, Plus, Search, Users, MessageCircle } from "lucide-react";
+import { ArrowLeft, Plus, Search, Users, MessageCircle, FileText } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 
 type Tenant = {
@@ -62,6 +62,7 @@ export default async function TenantsPage({
           <h2>{tenant.full_name}</h2>
           {tenant.phone && <p className="tenant-contact">{tenant.phone}</p>}
           {tenant.email && <p className="tenant-contact">{tenant.email}</p>}
+          <div className="dashboard-quick-links"><Link href={`/dashboard/inquilinos/${tenant.id}`}><FileText size={14}/> Ver ficha e contratos</Link></div>
           <div className="tenant-whatsapp">
             <MessageCircle size={15}/>
             <span>{tenant.whatsapp_phone || "WhatsApp não indicado"}</span>
