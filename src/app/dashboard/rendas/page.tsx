@@ -16,7 +16,7 @@ export default async function RentPage({searchParams}:{searchParams:Promise<{suc
  const {data:{user}}=await supabase.auth.getUser(); if(!user) redirect("/login");
  const {data:membership}=await supabase.from("memberships").select("organization_id").eq("user_id",user.id).limit(1).maybeSingle();
  if(!membership) redirect("/dashboard");
- const [{data,error},params]=await Promise.all([
+ const [{data},params]=await Promise.all([
   supabase.from("rent_charges").select("id,period_start,due_date,amount_due,amount_paid,status,description,leases(monthly_rent,units(name),tenants(full_name))")
    .eq("organization_id",membership.organization_id).order("due_date",{ascending:false}),
   searchParams
