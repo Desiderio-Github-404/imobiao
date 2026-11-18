@@ -2,12 +2,10 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { getActiveOrganization } from "@/lib/organization";
 
 export async function createTenant(formData: FormData) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const { supabase, membership } = await getActiveOrganization();
 
   const fullName = String(formData.get("full_name") ?? "").trim();
   const phone = String(formData.get("phone") ?? "").trim();
@@ -27,15 +25,7 @@ export async function createTenant(formData: FormData) {
     redirect("/dashboard/inquilinos/novo?erro=dados-invalidos");
   }
 
-  const { data: membership } = await supabase
-    .from("memberships")
-    .select("organization_id")
-    .eq("user_id", user.id)
-    .in("role", ["owner", "manager"])
-    .limit(1)
-    .maybeSingle();
-
-  if (!membership) redirect("/dashboard/inquilinos/novo?erro=sem-permissao");
+  if (!["owner", "manager"].includes(membership.role)) redirect("/dashboard/inquilinos/novo?erro=sem-permissao");
 
   const { error } = await supabase.from("tenants").insert({
     organization_id: membership.organization_id,
