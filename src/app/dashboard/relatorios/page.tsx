@@ -80,7 +80,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
   return <main className="dashboard-shell">
     <header className="dashboard-header"><div><Link className="brand" href="/dashboard">Imobi<span>AO</span></Link><p className="dashboard-subtitle">Gestão de património imobiliário</p></div><Link href="/dashboard" className="back-link"><ArrowLeft size={16}/> Painel principal</Link></header>
     <section className="dashboard-content report-content">
-      <div className="page-heading"><div><p className="eyebrow">ANÁLISE E CONTROLO</p><h1>Relatórios financeiros</h1><p className="auth-description">Acompanhe cobranças, recebimentos e dívidas com base nos registos da sua organização.</p></div><div className="report-actions"><button className="secondary-button" type="button" onClick={() => {}}><Printer size={15}/> Imprimir</button></div></div>
+      <div className="page-heading"><div><p className="eyebrow">ANÁLISE E CONTROLO</p><h1>Relatórios financeiros</h1><p className="auth-description">Acompanhe cobranças, recebimentos e dívidas com base nos registos da sua organização.</p></div></div>
       <form className="report-filters" method="get">
         <label>Data inicial<input type="date" name="inicio" defaultValue={start}/></label>
         <label>Data final<input type="date" name="fim" defaultValue={end}/></label>
