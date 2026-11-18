@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { ArrowLeft, Users, FileText, Home, CalendarDays } from "lucide-react";
+import { ArrowLeft, FileText, Home, CalendarDays } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 
 type Lease = {
