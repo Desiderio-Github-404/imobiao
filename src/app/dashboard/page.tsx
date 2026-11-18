@@ -75,7 +75,7 @@ export default async function DashboardPage() {
       <form action={signOut}><button className="logout-button"><LogOut size={16}/> Terminar sessão</button></form>
     </header>
     <section className="dashboard-content">
-      <div className="dashboard-welcome"><div><p className="eyebrow">PAINEL DE CONTROLO</p><h1>O seu património, sob controlo.</h1><p className="auth-description">Resumo atualizado com os dados registados na sua organização.</p></div><Link href="/dashboard/imoveis/novo" className="primary-link"><Plus size={17}/> Adicionar imóvel</a></div>
+      <div className="dashboard-welcome"><div><p className="eyebrow">PAINEL DE CONTROLO</p><h1>O seu património, sob controlo.</h1><p className="auth-description">Resumo atualizado com os dados registados na sua organização.</p></div><Link href="/dashboard/imoveis/novo" className="primary-link"><Plus size={17}/> Adicionar imóvel</Link></div>
       {!membership && <div className="notice-box">A sua conta ainda não está associada a uma organização. Termine o registo ou contacte o suporte para concluir a configuração.</div>}
       <div className="stats-grid">{stats.map(({label,value,icon:Icon})=><article className="stat-card" key={label}><span className="stat-icon"><Icon size={20}/></span><p>{label}</p><strong>{value}</strong></article>)}</div>
       {organizationId && <FinanceChart data={Array.from(monthly.values())} statuses={statusCounts}/>}
