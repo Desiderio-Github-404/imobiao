@@ -2,29 +2,25 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { getActiveOrganization } from "@/lib/organization";
 
 const allowedRoles = ["manager", "finance", "staff"];
 
 async function requireOwner() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
-  const { data: membership } = await supabase.from("memberships")
-    .select("organization_id,role").eq("user_id", user.id)
-    .order("created_at", { ascending: true }).limit(1).maybeSingle();
-  if (!membership || membership.role !== "owner") redirect("/dashboard?erro=sem-permissao");
-  return supabase;
+  const { supabase, membership } = await getActiveOrganization();
+  if (membership.role !== "owner") redirect("/dashboard?erro=sem-permissao");
+  return { supabase, organizationId: membership.organization_id };
 }
 
 export async function addTeamMember(formData: FormData) {
-  const supabase = await requireOwner();
+  const { supabase, organizationId } = await requireOwner();
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const role = String(formData.get("role") ?? "");
   if (!/^\S+@\S+\.\S+$/.test(email) || !allowedRoles.includes(role)) {
     redirect("/dashboard/equipa?erro=dados-invalidos");
   }
   const { error } = await supabase.rpc("add_org_member", {
+    p_organization_id: organizationId,
     p_email: email,
     p_role: role,
   });
@@ -39,13 +35,14 @@ export async function addTeamMember(formData: FormData) {
 }
 
 export async function updateTeamMemberRole(formData: FormData) {
-  const supabase = await requireOwner();
+  const { supabase, organizationId } = await requireOwner();
   const userId = String(formData.get("user_id") ?? "");
   const role = String(formData.get("role") ?? "");
   if (!/^[0-9a-f-]{36}$/i.test(userId) || !allowedRoles.includes(role)) {
     redirect("/dashboard/equipa?erro=dados-invalidos");
   }
   const { error } = await supabase.rpc("update_org_member_role", {
+    p_organization_id: organizationId,
     p_user_id: userId,
     p_role: role,
   });
@@ -55,10 +52,10 @@ export async function updateTeamMemberRole(formData: FormData) {
 }
 
 export async function removeTeamMember(formData: FormData) {
-  const supabase = await requireOwner();
+  const { supabase, organizationId } = await requireOwner();
   const userId = String(formData.get("user_id") ?? "");
   if (!/^[0-9a-f-]{36}$/i.test(userId)) redirect("/dashboard/equipa?erro=dados-invalidos");
-  const { error } = await supabase.rpc("remove_org_member", { p_user_id: userId });
+  const { error } = await supabase.rpc("remove_org_member", { p_organization_id: organizationId, p_user_id: userId });
   if (error) redirect("/dashboard/equipa?erro=falha-remocao");
   revalidatePath("/dashboard/equipa");
   redirect("/dashboard/equipa?sucesso=removido");
