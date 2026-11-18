@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { LogOut, Building2, Users, Wallet, Plus, Home, UserRoundPlus, FileText, Bell, Activity } from "lucide-react";
+import { LogOut, Building2, Users, Wallet, Plus, Home, UserRoundPlus, FileText, Bell, Activity, FileBarChart } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import FinanceChart from "./finance-chart";
 
@@ -80,7 +80,7 @@ export default async function DashboardPage() {
       <div className="stats-grid">{stats.map(({label,value,icon:Icon})=><article className="stat-card" key={label}><span className="stat-icon"><Icon size={20}/></span><p>{label}</p><strong>{value}</strong></article>)}</div>
       {organizationId && <FinanceChart data={Array.from(monthly.values())} statuses={statusCounts}/>}
       {(propertiesResult?.count ?? 0) === 0 ? <section className="empty-panel"><div className="empty-icon"><Building2 size={25}/></div><h2>Comece por registar o seu primeiro imóvel</h2><p>Depois poderá adicionar unidades, inquilinos, contratos e acompanhar as rendas.</p><Link href="/dashboard/imoveis/novo" className="primary-link"><Plus size={16}/> Registar primeiro imóvel</Link></section> : <section className="empty-panel"><div className="empty-icon"><Building2 size={25}/></div><h2>Os seus imóveis estão organizados</h2><p>Consulte a carteira de imóveis e continue a gerir o seu património.</p><Link href="/dashboard/imoveis" className="primary-link">Ver todos os imóveis</Link></section>}
-      <div className="dashboard-quick-links"><Link href="/dashboard/imoveis"><Building2 size={17}/> Imóveis</Link><Link href="/dashboard/unidades"><Home size={17}/> Unidades</Link><Link href="/dashboard/inquilinos"><UserRoundPlus size={17}/> Inquilinos</Link><Link href="/dashboard/contratos"><FileText size={17}/> Contratos</Link><Link href="/dashboard/rendas"><Wallet size={17}/> Rendas e pagamentos</Link><Link href="/dashboard/notificacoes"><Bell size={17}/> Notificações</Link><Link href="/dashboard/atividades"><Activity size={17}/> Histórico de atividades</Link></div><p className="dashboard-footnote">Os indicadores apresentados são calculados a partir dos registos reais da sua conta.</p>
+      <div className="dashboard-quick-links"><Link href="/dashboard/imoveis"><Building2 size={17}/> Imóveis</Link><Link href="/dashboard/unidades"><Home size={17}/> Unidades</Link><Link href="/dashboard/inquilinos"><UserRoundPlus size={17}/> Inquilinos</Link><Link href="/dashboard/contratos"><FileText size={17}/> Contratos</Link><Link href="/dashboard/rendas"><Wallet size={17}/> Rendas e pagamentos</Link><Link href="/dashboard/notificacoes"><Bell size={17}/> Notificações</Link><Link href="/dashboard/atividades"><Activity size={17}/> Histórico de atividades</Link><Link href="/dashboard/relatorios"><FileBarChart size={17}/> Relatórios financeiros</Link></div><p className="dashboard-footnote">Os indicadores apresentados são calculados a partir dos registos reais da sua conta.</p>
     </section>
   </main>;
 }
