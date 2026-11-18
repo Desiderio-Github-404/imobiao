@@ -2,12 +2,10 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { getActiveOrganization } from "@/lib/organization";
 
 export async function createLease(formData: FormData) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const { supabase, membership } = await getActiveOrganization();
 
   const unitId = String(formData.get("unit_id") ?? "");
   const tenantId = String(formData.get("tenant_id") ?? "");
@@ -34,15 +32,7 @@ export async function createLease(formData: FormData) {
     redirect("/dashboard/contratos/novo?erro=dados-invalidos");
   }
 
-  const { data: membership } = await supabase
-    .from("memberships")
-    .select("organization_id")
-    .eq("user_id", user.id)
-    .in("role", ["owner", "manager"])
-    .limit(1)
-    .maybeSingle();
-
-  if (!membership) redirect("/dashboard/contratos/novo?erro=sem-permissao");
+  if (!["owner", "manager"].includes(membership.role)) redirect("/dashboard/contratos/novo?erro=sem-permissao");
 
   const [{ data: unit }, { data: tenant }] = await Promise.all([
     supabase.from("units").select("id,status,monthly_rent").eq("id", unitId).eq("organization_id", membership.organization_id).maybeSingle(),
@@ -79,9 +69,7 @@ export async function createLease(formData: FormData) {
 
 
 export async function updateLease(formData: FormData) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const { supabase, membership } = await getActiveOrganization();
 
   const leaseId = String(formData.get("lease_id") ?? "");
   const startDate = String(formData.get("start_date") ?? "");
@@ -107,15 +95,7 @@ export async function updateLease(formData: FormData) {
     redirect(`/dashboard/contratos/${leaseId}/editar?erro=dados-invalidos`);
   }
 
-  const { data: membership } = await supabase
-    .from("memberships")
-    .select("organization_id")
-    .eq("user_id", user.id)
-    .in("role", ["owner", "manager"])
-    .limit(1)
-    .maybeSingle();
-
-  if (!membership) redirect("/dashboard/contratos?erro=sem-permissao");
+  if (!["owner", "manager"].includes(membership.role)) redirect("/dashboard/contratos?erro=sem-permissao");
 
   const { data: currentLease } = await supabase
     .from("leases")
@@ -154,9 +134,7 @@ export async function updateLease(formData: FormData) {
 
 
 export async function renewLease(formData: FormData) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const { supabase, membership } = await getActiveOrganization();
 
   const leaseId = String(formData.get("lease_id") ?? "");
   const startDate = String(formData.get("start_date") ?? "");
@@ -211,9 +189,7 @@ export async function renewLease(formData: FormData) {
 
 
 export async function terminateLease(formData: FormData) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const { supabase, membership } = await getActiveOrganization();
 
   const leaseId = String(formData.get("lease_id") ?? "");
   const terminationDate = String(formData.get("termination_date") ?? "");
