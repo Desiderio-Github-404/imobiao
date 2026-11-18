@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowLeft, ShieldCheck, UserPlus, Users, BriefcaseBusiness, Wallet, UserRound } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { getActiveOrganization } from "@/lib/organization";
 import { addTeamMember, updateTeamMemberRole, removeTeamMember } from "./actions";
 
 type TeamMember = {
@@ -31,14 +31,8 @@ export default async function TeamPage({
 }: {
   searchParams: Promise<{ sucesso?: string; erro?: string }>;
 }) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const { supabase, user, membership } = await getActiveOrganization();
 
-  const { data: membership } = await supabase.from("memberships")
-    .select("organization_id,role").eq("user_id", user.id)
-    .order("created_at", { ascending: true }).limit(1).maybeSingle();
-  if (!membership) redirect("/dashboard");
 
   const isOwner = membership.role === "owner";
   const { data: memberData, error } = await supabase.rpc("list_org_members");
