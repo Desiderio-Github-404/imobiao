@@ -1,9 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { Bell, CheckCheck, ArrowLeft, CreditCard, Clock, AlertTriangle } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
 import { getActiveOrganization } from "@/lib/organization";
 
 const labels: Record<string, string> = {
