@@ -156,10 +156,10 @@ export async function renewLease(formData: FormData) {
     redirect(`/dashboard/contratos/${leaseId}/renovar?erro=dados-invalidos`);
   }
 
-  const { data: membership } = await supabase.from("memberships")
-    .select("organization_id").eq("user_id", user.id)
-    .in("role", ["owner", "manager"]).limit(1).maybeSingle();
-  if (!membership) redirect("/dashboard/contratos?erro=sem-permissao");
+  if (!["owner", "manager"].includes(membership.role)) redirect("/dashboard/contratos?erro=sem-permissao");
+  const { data: activeLease } = await supabase.from("leases")
+    .select("id").eq("id", leaseId).eq("organization_id", membership.organization_id).maybeSingle();
+  if (!activeLease) redirect("/dashboard/contratos?erro=nao-encontrado");
 
   const { data: newLeaseId, error } = await supabase.rpc("renew_lease", {
     p_lease_id: leaseId,
@@ -200,10 +200,10 @@ export async function terminateLease(formData: FormData) {
     redirect(`/dashboard/contratos/${leaseId}/rescindir?erro=dados-invalidos`);
   }
 
-  const { data: membership } = await supabase.from("memberships")
-    .select("organization_id").eq("user_id", user.id)
-    .in("role", ["owner", "manager"]).limit(1).maybeSingle();
-  if (!membership) redirect("/dashboard/contratos?erro=sem-permissao");
+  if (!["owner", "manager"].includes(membership.role)) redirect("/dashboard/contratos?erro=sem-permissao");
+  const { data: activeLease } = await supabase.from("leases")
+    .select("id").eq("id", leaseId).eq("organization_id", membership.organization_id).maybeSingle();
+  if (!activeLease) redirect("/dashboard/contratos?erro=nao-encontrado");
 
   const { error } = await supabase.rpc("terminate_lease", {
     p_lease_id: leaseId,
