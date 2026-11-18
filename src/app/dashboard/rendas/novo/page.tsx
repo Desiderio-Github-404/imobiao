@@ -7,7 +7,6 @@ import { createRentCharge } from "../actions";
 export default async function NewChargePage({searchParams}:{searchParams:Promise<{erro?:string}>}) {
  const { supabase, user, membership } = await getActiveOrganization();
  if (!["owner", "manager", "finance"].includes(membership.role)) redirect("/dashboard/rendas?erro=sem-permissao");
- const {data:membership}=await supabase.from("memberships").select("organization_id").eq("user_id",user.id).limit(1).maybeSingle(); if(!membership) redirect("/dashboard");
  const [{data:leases},params]=await Promise.all([
   supabase.from("leases").select("id,monthly_rent,due_day,start_date,end_date,units(name),tenants(full_name)")
    .eq("organization_id",membership.organization_id).eq("status","active").order("created_at",{ascending:false}),
