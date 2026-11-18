@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowLeft, Building2, MapPin, Plus } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { getActiveOrganization } from "@/lib/organization";
 
 type Property = {
   id: string;
@@ -25,22 +25,13 @@ export default async function PropertiesPage({
 }: {
   searchParams: Promise<{ sucesso?: string }>;
 }) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const { supabase, user, membership } = await getActiveOrganization();
 
-  const { data: memberships } = await supabase
-    .from("memberships")
-    .select("organization_id")
-    .eq("user_id", user.id)
-    .limit(1);
-  const organizationId = memberships?.[0]?.organization_id;
-  if (!organizationId) redirect("/dashboard");
 
   const { data, error } = await supabase
     .from("properties")
     .select("id, name, property_type, address, municipality, province")
-    .eq("organization_id", organizationId)
+    .eq("organization_id", membership.organization_id)
     .order("created_at", { ascending: false });
 
   const params = await searchParams;
