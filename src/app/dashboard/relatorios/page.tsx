@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowLeft, FileBarChart, Download, Printer, TrendingUp, Wallet, AlertCircle, Building2 } from "lucide-react";
+import { ArrowLeft, FileBarChart, TrendingUp, Wallet, AlertCircle, Building2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import ReportsActions from "./reports-actions";
 
