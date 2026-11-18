@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowLeft, Home, Plus, MapPin } from "lucide-react";
+import { ArrowLeft, Home, Plus, MapPin, FileText } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 
 type Unit = {
@@ -94,6 +94,7 @@ export default async function UnitsPage({
                   {unit.bedrooms !== null && <span>{unit.bedrooms} quartos</span>}
                   {unit.bathrooms !== null && <span>{unit.bathrooms} WC</span>}
                 </div>
+                <div className="dashboard-quick-links"><Link href={`/dashboard/unidades/${unit.id}`}><FileText size={14}/> Ver ficha e histórico</Link></div>
                 <p className="unit-rent">{new Intl.NumberFormat("pt-AO").format(Number(unit.monthly_rent))} Kz/mês</p>
               </article>
             ))}
