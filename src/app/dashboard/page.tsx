@@ -2,21 +2,14 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { LogOut, Building2, Users, Wallet, Plus, Home, UserRoundPlus, FileText, Bell, Activity, FileBarChart } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { getActiveOrganization } from "@/lib/organization";
 import FinanceChart from "./finance-chart";
 
 export default async function DashboardPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
-
-  const { data: memberships } = await supabase
-    .from("memberships")
-    .select("organization_id, role, organizations(name)")
-    .eq("user_id", user.id)
-    .limit(1);
-  const membership = memberships?.[0];
-  const org = membership?.organizations as unknown as { name: string } | null;
-  const organizationId = membership?.organization_id;
+  const { supabase, membership } = await getActiveOrganization();
+  const relation = membership.organizations as unknown as { name: string } | { name: string }[] | null;
+  const org = Array.isArray(relation) ? relation[0] : relation;
+  const organizationId = membership.organization_id;
 
   const twelveMonthsAgo = new Date();
   twelveMonthsAgo.setUTCMonth(twelveMonthsAgo.getUTCMonth() - 11);
@@ -72,11 +65,11 @@ export default async function DashboardPage() {
   return <main className="dashboard-shell">
     <header className="dashboard-header">
       <div><Link className="brand" href="/dashboard">Imobi<span>AO</span></Link><p className="dashboard-subtitle">{org?.name ?? "A sua organização"}</p></div>
-      <form action={signOut}><button className="logout-button"><LogOut size={16}/> Terminar sessão</button></form>
+      <div style={{ display: "flex", gap: "10px", alignItems: "center" }}><Link href="/dashboard/organizacoes" className="secondary-button">Trocar organização</Link><form action={signOut}><button className="logout-button"><LogOut size={16}/> Terminar sessão</button></form></div>
     </header>
     <section className="dashboard-content">
       <div className="dashboard-welcome"><div><p className="eyebrow">PAINEL DE CONTROLO</p><h1>O seu património, sob controlo.</h1><p className="auth-description">Resumo atualizado com os dados registados na sua organização.</p></div><Link href="/dashboard/imoveis/novo" className="primary-link"><Plus size={17}/> Adicionar imóvel</Link></div>
-      {!membership && <div className="notice-box">A sua conta ainda não está associada a uma organização. Termine o registo ou contacte o suporte para concluir a configuração.</div>}
+      
       <div className="stats-grid">{stats.map(({label,value,icon:Icon})=><article className="stat-card" key={label}><span className="stat-icon"><Icon size={20}/></span><p>{label}</p><strong>{value}</strong></article>)}</div>
       {organizationId && <FinanceChart data={Array.from(monthly.values())} statuses={statusCounts}/>}
       {(propertiesResult?.count ?? 0) === 0 ? <section className="empty-panel"><div className="empty-icon"><Building2 size={25}/></div><h2>Comece por registar o seu primeiro imóvel</h2><p>Depois poderá adicionar unidades, inquilinos, contratos e acompanhar as rendas.</p><Link href="/dashboard/imoveis/novo" className="primary-link"><Plus size={16}/> Registar primeiro imóvel</Link></section> : <section className="empty-panel"><div className="empty-icon"><Building2 size={25}/></div><h2>Os seus imóveis estão organizados</h2><p>Consulte a carteira de imóveis e continue a gerir o seu património.</p><Link href="/dashboard/imoveis" className="primary-link">Ver todos os imóveis</Link></section>}
