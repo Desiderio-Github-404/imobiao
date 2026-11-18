@@ -44,3 +44,7 @@ Nunca exponhas a chave Supabase service_role ou qualquer segredo no browser, em 
 Consulta [Documentação Técnica e Guia de Implementação](docs/DOCUMENTACAO_TECNICA_E_IMPLEMENTACAO.md) para arquitetura, configuração Supabase, publicação na Vercel, migrações, manutenção e transferência ao comprador.
 
 > Antes de uma entrega comercial, confirma as variáveis de ambiente, migrações e integrações efetivamente usadas pela versão que será entregue.
+
+## Entrega comercial
+
+Consulta o [Pacote de Entrega Comercial](docs/PACOTE_DE_ENTREGA_COMERCIAL.md) para preparar a transferência ao comprador, configurar os serviços sob titularidade do cliente e executar os testes de aceitação.
