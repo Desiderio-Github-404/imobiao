@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowLeft, Users, MessageCircle } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { getActiveOrganization } from "@/lib/organization";
 import { createTenant } from "../actions";
 
 export default async function NewTenantPage({
@@ -9,9 +9,8 @@ export default async function NewTenantPage({
 }: {
   searchParams: Promise<{ erro?: string }>;
 }) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const { supabase, user, membership } = await getActiveOrganization();
+  if (!["owner", "manager"].includes(membership.role)) redirect("/dashboard?erro=sem-permissao");
   const params = await searchParams;
   const errorMessages: Record<string, string> = {
     "dados-invalidos": "Verifique os dados. Para ativar notificações, indique um WhatsApp válido com indicativo internacional (ex.: +244...).",
