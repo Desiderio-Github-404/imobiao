@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ArrowLeft, FileX2 } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { getActiveOrganization } from "@/lib/organization";
 import { terminateLease } from "../../actions";
 
 type Props = {
@@ -12,9 +12,8 @@ type Props = {
 export default async function TerminateLeasePage({ params, searchParams }: Props) {
   const { id } = await params;
   const query = await searchParams;
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const { supabase, user, membership } = await getActiveOrganization();
+  if (!["owner", "manager"].includes(membership.role)) redirect("/dashboard/contratos");
 
   const { data: membership } = await supabase.from("memberships")
     .select("organization_id").eq("user_id", user.id)
