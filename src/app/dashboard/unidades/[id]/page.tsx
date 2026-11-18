@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ArrowLeft, FileText, Users, CalendarDays } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { getActiveOrganization } from "@/lib/organization";
 
 type Lease = {
   id: string;
@@ -19,13 +19,8 @@ const statusLabels: Record<string, string> = {
 
 export default async function UnitDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const { supabase, user, membership } = await getActiveOrganization();
 
-  const { data: membership } = await supabase.from("memberships")
-    .select("organization_id").eq("user_id", user.id).limit(1).maybeSingle();
-  if (!membership) redirect("/dashboard");
 
   const [{ data: unit }, { data: leases, error }] = await Promise.all([
     supabase.from("units").select("id,name,floor,monthly_rent,status,properties(name)")
