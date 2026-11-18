@@ -297,3 +297,40 @@ a { text-decoration:none; }
 @media(max-width:800px) { .report-filters { grid-template-columns:1fr 1fr; } .report-stats { grid-template-columns:repeat(2,minmax(0,1fr)); } .report-panel-heading { align-items:flex-start; flex-direction:column; } }
 @media(max-width:480px) { .report-filters { grid-template-columns:1fr; } .report-stats { grid-template-columns:1fr 1fr; } .report-stat { padding:14px; } .report-panel { padding:15px 10px; } }
 @media print { .dashboard-header,.report-filters,.report-actions,.back-link { display:none !important; } body { background:#fff !important; } .dashboard-content.report-content { max-width:none; padding:0; } .report-panel,.report-stat { break-inside:avoid; box-shadow:none; } .report-table { white-space:normal; } .report-table th,.report-table td { padding:7px 5px; font-size:8px; } }
+
+
+/* Organization team and permissions */
+.team-content { max-width:1000px; }
+.team-count { display:flex; align-items:center; gap:8px; padding:12px 15px; border:1px solid var(--border); border-radius:12px; background:#fff; color:#2864e8; }
+.team-count strong { color:#172b49; font-size:18px; }
+.team-count span { color:#718096; font-size:11px; }
+.team-role-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-bottom:20px; }
+.team-role-grid article { padding:17px; border:1px solid var(--border); border-radius:13px; background:#fff; }
+.team-role-grid article>span { display:grid; place-items:center; width:35px; height:35px; margin-bottom:12px; border-radius:10px; background:#edf4ff; color:#2864e8; }
+.team-role-grid h2 { margin:0 0 6px; color:#172b49; font-size:13px; }
+.team-role-grid p { margin:0; color:#718096; font-size:10px; line-height:1.55; }
+.team-add-panel,.team-list-panel { margin-top:18px; padding:21px; border:1px solid var(--border); border-radius:15px; background:#fff; }
+.team-add-panel h2,.team-list-heading h2 { display:flex; align-items:center; gap:8px; margin:0; color:#172b49; font-size:16px; }
+.team-add-panel h2 svg { color:#2864e8; }
+.team-add-panel p,.team-list-heading p { margin:6px 0 0; color:#718096; font-size:11px; }
+.team-add-form { display:grid; grid-template-columns:1.5fr 1fr auto; align-items:end; gap:12px; margin-top:17px; }
+.team-add-form label { display:grid; gap:7px; color:#34445c; font-size:11px; font-weight:700; }
+.team-add-form input,.team-add-form select,.team-member-actions select { width:100%; min-width:0; min-height:42px; padding:9px 11px; border:1px solid #dfe6ef; border-radius:9px; background:#fff; color:#172b49; font-size:12px; }
+.team-list-heading { margin-bottom:15px; }
+.team-member-list { display:grid; }
+.team-member { display:flex; align-items:center; gap:13px; padding:15px 0; border-top:1px solid #f0f3f8; }
+.team-avatar { display:grid; place-items:center; flex:0 0 40px; width:40px; height:40px; border-radius:50%; background:#edf4ff; color:#2864e8; font-size:14px; font-weight:800; }
+.team-member-info { display:grid; flex:1; min-width:0; gap:4px; }
+.team-member-info strong { color:#172b49; font-size:12px; overflow-wrap:anywhere; }
+.team-member-info span { color:#64748b; font-size:11px; overflow-wrap:anywhere; }
+.team-member-info small { color:#94a3b8; font-size:10px; }
+.team-role-badge { padding:6px 9px; border-radius:20px; background:#f1f5f9; color:#53627a; font-size:9px; font-weight:800; white-space:nowrap; }
+.role-owner { background:#eaf2ff; color:#2455b5; }.role-manager { background:#ecfdf3; color:#067647; }.role-finance { background:#fff7e8; color:#a15c07; }
+.team-member-actions { display:flex; align-items:center; gap:8px; }
+.team-member-actions form { display:flex; align-items:center; gap:6px; }
+.team-member-actions select { min-height:36px; padding:7px; font-size:10px; }
+.team-member-actions .secondary-button { min-height:36px; padding:0 9px; font-size:10px; }
+.team-remove-button { min-height:36px; padding:0 9px; border:1px solid #f3caca; border-radius:8px; background:#fff; color:#b42318; font-size:10px; font-weight:700; cursor:pointer; }
+@media(max-width:850px) { .team-role-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }.team-add-form { grid-template-columns:1fr 1fr; }.team-add-form button { grid-column:1/-1; } }
+@media(max-width:650px) { .team-member { flex-wrap:wrap; }.team-member-info { flex-basis:calc(100% - 60px); }.team-role-badge { margin-left:53px; }.team-member-actions { width:100%; margin-left:53px; flex-wrap:wrap; }.team-member-actions form:first-child { flex:1; }.team-member-actions select { max-width:140px; } }
+@media(max-width:480px) { .team-role-grid { grid-template-columns:1fr 1fr; }.team-add-form { grid-template-columns:1fr; }.team-add-form button { grid-column:auto; }.team-add-panel,.team-list-panel { padding:16px 12px; } }
