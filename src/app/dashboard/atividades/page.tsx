@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { getActiveOrganization } from "@/lib/organization";
 import { redirect } from "next/navigation";
 import { ArrowLeft, Activity, PlusCircle, Pencil, Trash2, Clock3 } from "lucide-react";
 
@@ -22,12 +22,7 @@ function describe(log: ActivityLog) {
 }
 
 export default async function AtividadesPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
-  const { data: membership } = await supabase.from("memberships")
-    .select("organization_id").eq("user_id", user.id).limit(1).maybeSingle();
-  if (!membership) redirect("/dashboard");
+  const { supabase, user, membership } = await getActiveOrganization();
 
   const { data: logs, error } = await supabase.from("activity_logs")
     .select("id,actor_id,table_name,record_id,operation,old_data,new_data,created_at")
