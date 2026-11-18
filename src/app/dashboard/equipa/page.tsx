@@ -21,7 +21,7 @@ const roleLabels: Record<TeamMember["role"], string> = {
 
 const roleDescriptions: Record<TeamMember["role"], string> = {
   owner: "Acesso total e controlo da equipa.",
-  manager: "Gestão operacional de imóveis, unidades, inquilinos e contratos.",
+  manager: "Gestão da carteira, contratos e operações gerais da organização.",
   finance: "Gestão de cobranças, pagamentos e operações financeiras.",
   staff: "Consulta dos dados, sem permissões de alteração.",
 };
@@ -76,7 +76,7 @@ export default async function TeamPage({
 
       <div className="team-role-grid">
         <article><span><ShieldCheck size={18}/></span><h2>Proprietário</h2><p>Acesso total, incluindo gestão de membros e permissões.</p></article>
-        <article><span><BriefcaseBusiness size={18}/></span><h2>Gestor</h2><p>Gere imóveis, unidades, inquilinos e contratos.</p></article>
+        <article><span><BriefcaseBusiness size={18}/></span><h2>Gestor</h2><p>Gere a carteira, contratos e operações gerais da organização.</p></article>
         <article><span><Wallet size={18}/></span><h2>Financeiro</h2><p>Gere cobranças e pagamentos, sem gerir o património.</p></article>
         <article><span><UserRound size={18}/></span><h2>Assistente</h2><p>Consulta os dados, sem alterar registos.</p></article>
       </div>
