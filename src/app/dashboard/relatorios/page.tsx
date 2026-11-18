@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowLeft, FileBarChart, TrendingUp, Wallet, AlertCircle, Building2 } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { getActiveOrganization } from "@/lib/organization";
 import ReportsActions from "./reports-actions";
 
 type ReportCharge = {
@@ -23,13 +23,8 @@ const money = (value: number) => new Intl.NumberFormat("pt-AO", { maximumFractio
 const dateValue = (value: string) => new Date(value + "T12:00:00").toLocaleDateString("pt-AO");
 
 export default async function ReportsPage({ searchParams }: { searchParams: Promise<{ inicio?: string; fim?: string; imovel?: string }> }) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const { supabase, user, membership } = await getActiveOrganization();
 
-  const { data: membership } = await supabase.from("memberships")
-    .select("organization_id").eq("user_id", user.id).limit(1).maybeSingle();
-  if (!membership) redirect("/dashboard");
 
   const params = await searchParams;
   const today = new Date();
