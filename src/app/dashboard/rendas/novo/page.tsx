@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowLeft, Wallet } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { getActiveOrganization } from "@/lib/organization";
 import { createRentCharge } from "../actions";
 
 export default async function NewChargePage({searchParams}:{searchParams:Promise<{erro?:string}>}) {
- const supabase=await createClient(); const {data:{user}}=await supabase.auth.getUser(); if(!user) redirect("/login");
+ const { supabase, user, membership } = await getActiveOrganization();
+ if (!["owner", "manager", "finance"].includes(membership.role)) redirect("/dashboard/rendas?erro=sem-permissao");
  const {data:membership}=await supabase.from("memberships").select("organization_id").eq("user_id",user.id).limit(1).maybeSingle(); if(!membership) redirect("/dashboard");
  const [{data:leases},params]=await Promise.all([
   supabase.from("leases").select("id,monthly_rent,due_day,start_date,end_date,units(name),tenants(full_name)")
