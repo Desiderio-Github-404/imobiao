@@ -31,11 +31,11 @@ export default async function TeamPage({
 }: {
   searchParams: Promise<{ sucesso?: string; erro?: string }>;
 }) {
-  const { supabase, user, membership } = await getActiveOrganization();
+  const { supabase, membership } = await getActiveOrganization();
 
 
   const isOwner = membership.role === "owner";
-  const { data: memberData, error } = await supabase.rpc("list_org_members");
+  const { data: memberData, error } = await supabase.rpc("list_org_members", { p_organization_id: membership.organization_id });
   const members = (memberData ?? []) as TeamMember[];
   const params = await searchParams;
 
