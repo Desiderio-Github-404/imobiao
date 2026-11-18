@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { getActiveOrganization } from "@/lib/organization";
 import PrintButton from "./print-button";
 
 type Receipt = {
@@ -35,13 +35,8 @@ const money = (value: number) => new Intl.NumberFormat("pt-AO", { maximumFractio
 
 export default async function ReceiptPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const { supabase, user, membership } = await getActiveOrganization();
 
-  const { data: membership } = await supabase.from("memberships")
-    .select("organization_id").eq("user_id", user.id).limit(1).maybeSingle();
-  if (!membership) redirect("/dashboard");
 
   const { data } = await supabase.from("payments")
     .select("id,receipt_number,amount,payment_date,payment_method,reference,notes,rent_charges!inner(period_start,due_date,amount_due,amount_paid,leases!inner(monthly_rent,tenants!inner(full_name,phone,identity_document),units!inner(name,properties!inner(name,address,municipality,province))))")
