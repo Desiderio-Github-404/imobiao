@@ -222,3 +222,24 @@ a { text-decoration:none; }
 .status-legend strong { color:#172b49; font-size:11px; }
 @media(max-width:850px) { .analytics-grid { grid-template-columns:1fr; } }
 @media(max-width:480px) { .status-chart-layout { gap:0; } .status-chart { width:54%; } .status-legend { gap:10px; } }
+
+
+/* Tenant and unit history detail pages */
+.detail-summary { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-bottom:22px; }
+.detail-summary div { display:grid; gap:7px; min-width:0; padding:16px; border:1px solid var(--border); border-radius:12px; background:#fff; }
+.detail-summary span { color:#718096; font-size:10px; font-weight:700; }
+.detail-summary strong { color:#172b49; font-size:12px; overflow-wrap:anywhere; }
+.history-heading { display:flex; align-items:flex-end; justify-content:space-between; gap:15px; margin:30px 0 16px; }
+.history-heading .eyebrow { margin:0 0 7px; }
+.history-heading h2 { margin:0; color:#172b49; font-size:19px; }
+.history-heading > span { color:#718096; font-size:11px; }
+.history-list { display:grid; gap:12px; }
+.history-card { padding:19px; border:1px solid var(--border); border-radius:14px; background:#fff; }
+.history-card-top { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+.history-card-top strong { color:#172b49; font-size:13px; }
+.history-card p { display:flex; align-items:center; gap:8px; margin:12px 0 0; color:#53627a; font-size:12px; }
+.history-card p svg { color:#718096; flex:0 0 auto; }
+.history-card small { display:block; margin-top:12px; color:#9a3412; font-size:11px; line-height:1.5; }
+.history-card a { display:inline-flex; margin-top:15px; color:#2864e8; font-size:11px; font-weight:800; }
+@media(max-width:650px) { .detail-summary { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:420px) { .detail-summary { grid-template-columns:1fr; } .history-card-top { align-items:flex-start; flex-direction:column; } }
