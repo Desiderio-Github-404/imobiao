@@ -14,7 +14,7 @@ export async function createRentCharge(formData: FormData) {
   if (!leaseId || !/^\d{4}-\d{2}$/.test(period)) redirect("/dashboard/rendas/novo?erro=dados-invalidos");
 
   const { data: membership } = await supabase.from("memberships")
-    .select("organization_id").eq("user_id", user.id).in("role", ["owner","manager"]).limit(1).maybeSingle();
+    .select("organization_id").eq("user_id", user.id).in("role", ["owner","manager","finance"]).limit(1).maybeSingle();
   if (!membership) redirect("/dashboard/rendas/novo?erro=sem-permissao");
 
   const { data: lease } = await supabase.from("leases")
@@ -70,7 +70,7 @@ export async function recordPayment(formData: FormData) {
   }
 
   const { data: membership } = await supabase.from("memberships")
-    .select("organization_id").eq("user_id", user.id).in("role", ["owner","manager"]).limit(1).maybeSingle();
+    .select("organization_id").eq("user_id", user.id).in("role", ["owner","manager","finance"]).limit(1).maybeSingle();
   if (!membership) redirect("/dashboard/rendas?erro=sem-permissao");
 
   const { data: charge } = await supabase.from("rent_charges")
