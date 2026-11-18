@@ -2,20 +2,16 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { getActiveOrganization } from "@/lib/organization";
 
 export async function createRentCharge(formData: FormData) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const { supabase, membership } = await getActiveOrganization();
 
   const leaseId = String(formData.get("lease_id") ?? "");
   const period = String(formData.get("period") ?? "");
   if (!leaseId || !/^\d{4}-\d{2}$/.test(period)) redirect("/dashboard/rendas/novo?erro=dados-invalidos");
 
-  const { data: membership } = await supabase.from("memberships")
-    .select("organization_id").eq("user_id", user.id).in("role", ["owner","manager","finance"]).limit(1).maybeSingle();
-  if (!membership) redirect("/dashboard/rendas/novo?erro=sem-permissao");
+  if (!["owner", "manager", "finance"].includes(membership.role)) redirect("/dashboard/rendas/novo?erro=sem-permissao");
 
   const { data: lease } = await supabase.from("leases")
     .select("id,start_date,end_date,monthly_rent,due_day,status")
@@ -50,9 +46,7 @@ export async function createRentCharge(formData: FormData) {
 }
 
 export async function recordPayment(formData: FormData) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const { supabase, membership } = await getActiveOrganization();
 
   const chargeId = String(formData.get("charge_id") ?? "");
   const amountRaw = String(formData.get("amount") ?? "").trim();
@@ -69,9 +63,7 @@ export async function recordPayment(formData: FormData) {
     redirect("/dashboard/rendas?erro=dados-invalidos");
   }
 
-  const { data: membership } = await supabase.from("memberships")
-    .select("organization_id").eq("user_id", user.id).in("role", ["owner","manager","finance"]).limit(1).maybeSingle();
-  if (!membership) redirect("/dashboard/rendas?erro=sem-permissao");
+  if (!["owner", "manager", "finance"].includes(membership.role)) redirect("/dashboard/rendas?erro=sem-permissao");
 
   const { data: charge } = await supabase.from("rent_charges")
     .select("id,amount_due,amount_paid").eq("id",chargeId)
