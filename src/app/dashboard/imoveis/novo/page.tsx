@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowLeft, Building2 } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { getActiveOrganization } from "@/lib/organization";
 import { createProperty } from "../actions";
 
 const errorMessages: Record<string, string> = {
@@ -15,9 +15,8 @@ export default async function NewPropertyPage({
 }: {
   searchParams: Promise<{ erro?: string }>;
 }) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const { supabase, user, membership } = await getActiveOrganization();
+  if (!["owner", "manager"].includes(membership.role)) redirect("/dashboard?erro=sem-permissao");
   const params = await searchParams;
 
   return (
