@@ -50,8 +50,10 @@ begin
   end if;
   select id into v_user from auth.users where lower(email) = lower(trim(p_email)) limit 1;
   if v_user is null then raise exception 'No account exists for this email. The person must register first.'; end if;
-  insert into public.memberships(organization_id,user_id,role) values(v_org,v_user,p_role)
-  on conflict (organization_id,user_id) do update set role = excluded.role;
+  if exists (select 1 from public.memberships where organization_id = v_org and user_id = v_user) then
+    raise exception 'Member already exists';
+  end if;
+  insert into public.memberships(organization_id,user_id,role) values(v_org,v_user,p_role);
   return v_user;
 end;
 $$;
